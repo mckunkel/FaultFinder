@@ -49,6 +49,7 @@ public class DeadWireLogic implements FaultLogic {
 		statusChangeDB.setRunno(this.mainFrameService.getRunNumber());
 		queryList.add(statusChangeDB);
 		this.mainFrameService.prepareMYSQLQuery(queryList);
+		this.mainFrameService.removeRowFromMYSQLQuery(queryList);
 		this.mainFrameService.addToCompleteSQLList(queryList);
 		this.mainFrameService.getDataPanel().removeItems(queryList);
 		this.mainFrameService.clearTempSQLList();

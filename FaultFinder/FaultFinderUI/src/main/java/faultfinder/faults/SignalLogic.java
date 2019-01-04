@@ -58,6 +58,7 @@ public class SignalLogic implements FaultLogic {
 
 		}
 		this.mainFrameService.prepareMYSQLQuery(queryList);
+		this.mainFrameService.removeRowFromMYSQLQuery(queryList);
 		this.mainFrameService.addToCompleteSQLList(queryList);
 		this.mainFrameService.getDataPanel().removeItems(queryList);
 		this.mainFrameService.clearTempSQLList();

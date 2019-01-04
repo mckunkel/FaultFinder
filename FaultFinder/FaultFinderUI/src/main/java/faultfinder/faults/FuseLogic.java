@@ -57,10 +57,10 @@ public class FuseLogic implements FaultLogic {
 
 		}
 		this.mainFrameService.prepareMYSQLQuery(queryList);
+		this.mainFrameService.removeRowFromMYSQLQuery(queryList);
 		this.mainFrameService.addToCompleteSQLList(queryList);
 		this.mainFrameService.getDataPanel().removeItems(queryList);
 		this.mainFrameService.clearTempSQLList();
-		this.mainFrameService.getSQLPanel().removeItems(queryList);
 		this.mainFrameService.getSQLPanel().setTableModel(this.mainFrameService.getCompleteSQLList());
 
 	}

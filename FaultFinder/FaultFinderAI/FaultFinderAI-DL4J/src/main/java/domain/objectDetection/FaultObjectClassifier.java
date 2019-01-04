@@ -2,6 +2,7 @@ package domain.objectDetection;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 
 import org.datavec.api.records.reader.RecordReader;
@@ -31,26 +32,28 @@ public class FaultObjectClassifier {
 	 *            The file that the model is loaded from.
 	 */
 	public FaultObjectClassifier(String fileName) throws IOException {
-
-		this.network = ModelSerializer.restoreComputationGraph(new File(fileName));
-
+		InputStream is = this.getClass().getResourceAsStream(fileName);
+		this.network = ModelSerializer.restoreComputationGraph(is);
 	}
 
 	public FaultObjectClassifier(String fileName, FaultObjectContainer container) throws IOException {
 		this.container = container;
+		InputStream is = this.getClass().getResourceAsStream(fileName);
+
 		if (container.getClasObject().getContainerType().equals(ContainerType.CLASS)) {
-			this.network = ModelSerializer.restoreMultiLayerNetwork(new File(fileName)).toComputationGraph();
+			this.network = ModelSerializer.restoreMultiLayerNetwork(is).toComputationGraph();
 		} else {
-			this.network = ModelSerializer.restoreComputationGraph(new File(fileName));
+			this.network = ModelSerializer.restoreComputationGraph(is);
 		}
 
 	}
 
 	public FaultObjectClassifier(String fileName, ContainerType container) throws IOException {
+		InputStream is = this.getClass().getResourceAsStream(fileName);
 		if (container.equals(ContainerType.CLASS) || container.equals(ContainerType.MULTICLASS)) {
-			this.network = ModelSerializer.restoreMultiLayerNetwork(new File(fileName)).toComputationGraph();
+			this.network = ModelSerializer.restoreMultiLayerNetwork(is).toComputationGraph();
 		} else {
-			this.network = ModelSerializer.restoreComputationGraph(new File(fileName));
+			this.network = ModelSerializer.restoreComputationGraph(is);
 		}
 
 	}

@@ -55,12 +55,22 @@
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
-							<finalName>DCFaultFinderApp</finalName>
+							<finalName>DCFaultFinderWithRecommendationSystemApp</finalName>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>models/</directory>
+				<includes>
+					<include>Classifiers/*.zip</include>
+					<include>MultiClass/*.zip</include>
+					<include>ObjectDectors/*.zip</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
 </project>

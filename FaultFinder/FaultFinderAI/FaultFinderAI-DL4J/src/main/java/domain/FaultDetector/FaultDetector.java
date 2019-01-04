@@ -38,11 +38,11 @@ public abstract class FaultDetector {
 	protected FaultObjectClassifier slidingClassifier;
 
 	protected void init() throws IOException {
-		this.classifyFile = "models/Classifiers/" + desiredFault + ".zip";
-		this.objectFile = "models/MultiClass/" + desiredFault + ".zip";
-		this.slidingFile = "models/ObjectDetectors/" + desiredFault + ".zip";
-
+		this.classifyFile = "/models/Classifiers/" + desiredFault + ".zip";
+		this.objectFile = "/models/MultiClass/" + desiredFault + ".zip";
+		this.slidingFile = "/models/ObjectDetectors/" + desiredFault + ".zip";
 		this.faultSlidingInformation = this.desiredFault.getFSlidingInformation();
+
 		this.classClassifier = new FaultObjectClassifier(classifyFile, ContainerType.CLASS);
 		this.objectClassifier = new FaultObjectClassifier(objectFile);
 		this.slidingClassifier = new FaultObjectClassifier(slidingFile);
