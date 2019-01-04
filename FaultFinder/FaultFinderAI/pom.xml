@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.mkunkel</groupId>
+		<artifactId>FaultFinder</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>FaultFinderAI</artifactId>
+	<packaging>pom</packaging>
+	<description>Recommendation System for CLAS12 DC Fault Finder</description>
+	<modules>
+		<module>FaultFinderAI-Data</module>
+		<module>FaultFinderAI-DL4J</module>
+		<module>FaultFinderAI-Faults</module>
+		<module>FaultFinderAI-Utils</module>
+	</modules>
+	<dependencies>
+		<dependency>
+			<groupId>org.deeplearning4j</groupId>
+			<artifactId>deeplearning4j-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.nd4j</groupId>
+			<artifactId>nd4j-native-platform</artifactId>
+		</dependency>
+	</dependencies>
+</project>
