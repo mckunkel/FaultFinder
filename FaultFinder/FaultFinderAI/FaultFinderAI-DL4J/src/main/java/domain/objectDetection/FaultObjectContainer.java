@@ -76,7 +76,7 @@ public class FaultObjectContainer {
 	}
 
 	public static void main(String[] args) {
-		CLASObject object = SuperLayer.builder().superlayer(1).nchannels(1).maxFaults(10)
+		CLASObject object = SuperLayer.builder().superlayer(1).randomSuperlayer(false).nchannels(1).maxFaults(10)
 				.desiredFaults(Stream.of(FaultNames.CONNECTOR_TREE, FaultNames.CONNECTOR_TREE, FaultNames.CHANNEL_THREE,
 						FaultNames.PIN_SMALL).collect(Collectors.toCollection(ArrayList::new)))
 				.singleFaultGen(false).containerType(ContainerType.SEG).build();

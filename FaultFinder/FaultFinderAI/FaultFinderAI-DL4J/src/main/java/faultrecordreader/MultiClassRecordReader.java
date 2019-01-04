@@ -227,8 +227,8 @@ public class MultiClassRecordReader implements RecordReader {
 		// FaultNames.CHANNEL_ONE,
 		// FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG,
 		// FaultNames.PIN_SMALL, FaultNames.DEADWIRE, FaultNames.HOTWIRE
-		CLASObject object = SuperLayer.builder().superlayer(3).nchannels(1).minFaults(1).maxFaults(4)
-				.singleFaultGen(false).containerType(ContainerType.MULTICLASS)
+		CLASObject object = SuperLayer.builder().superlayer(3).randomSuperlayer(true).nchannels(1).minFaults(1)
+				.maxFaults(4).singleFaultGen(false).containerType(ContainerType.MULTICLASS)
 				.desiredFaults(Stream
 						.of(FaultNames.FUSE_A, FaultNames.FUSE_B, FaultNames.FUSE_C, FaultNames.CONNECTOR_TREE,
 								FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_E, FaultNames.CHANNEL_ONE,

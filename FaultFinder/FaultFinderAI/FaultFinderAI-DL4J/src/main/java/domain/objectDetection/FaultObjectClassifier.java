@@ -50,12 +50,13 @@ public class FaultObjectClassifier {
 
 	public FaultObjectClassifier(String fileName, ContainerType container) throws IOException {
 		InputStream is = this.getClass().getResourceAsStream(fileName);
-		if (container.equals(ContainerType.CLASS) || container.equals(ContainerType.MULTICLASS)) {
+		System.out.println(is);
+		if (container.equals(ContainerType.CLASS)) {
 			this.network = ModelSerializer.restoreMultiLayerNetwork(is).toComputationGraph();
 		} else {
 			this.network = ModelSerializer.restoreComputationGraph(is);
 		}
-
+		// || container.equals(ContainerType.MULTICLASS)
 	}
 
 	/**

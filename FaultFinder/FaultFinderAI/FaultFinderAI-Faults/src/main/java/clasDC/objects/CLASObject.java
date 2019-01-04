@@ -159,8 +159,8 @@ public abstract class CLASObject {
 	}
 
 	public static void main(String[] args) {
-		CLASObject clasObject = SuperLayer.builder().superlayer(1).nchannels(1).minFaults(2).maxFaults(3)
-				.desiredFault(FaultNames.CHANNEL_ONE)
+		CLASObject clasObject = SuperLayer.builder().superlayer(1).randomSuperlayer(false).nchannels(1).minFaults(2)
+				.maxFaults(3).desiredFault(FaultNames.CHANNEL_ONE)
 				.desiredFaults(Stream.of(FaultNames.CONNECTOR_TREE, FaultNames.CHANNEL_TWO)
 						.collect(Collectors.toCollection(ArrayList::new)))
 				.singleFaultGen(false).isScaled(false).containerType(ContainerType.OBJ).desiredFaultGenRate(0.5)

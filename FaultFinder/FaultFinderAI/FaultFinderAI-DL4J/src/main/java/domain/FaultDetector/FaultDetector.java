@@ -67,14 +67,20 @@ public abstract class FaultDetector {
 
 	public List<Fault> getFaults(INDArray data) {
 		List<Fault> ret = new ArrayList<>();
-		// System.out.println("##########CLASSIFICATION################");
-		// System.out.println(this.getClassifierPredictions(data).dup().getDouble(0)
-		// + " " + this.desiredFault);
-		// System.out.println("##########################");
+		System.out.println("##########CLASSIFICATION################");
+		System.out.println(this.getClassifierPredictions(data).dup().getDouble(0) + " " + this.desiredFault);
+		System.out.println("##########################");
 
+		INDArray objectPredictions = this.getObjectPredictions(data);
+
+		System.out.println("##########OBJECT################");
+		System.out.println(desiredFault);
+		System.out.println(objectPredictions);
+		System.out.println("##########################");
 		if (this.getClassifierPredictions(data).dup().getDouble(0) > 0.5) {
 
-			INDArray objectPredictions = this.getObjectPredictions(data);
+			// INDArray objectPredictions = this.getObjectPredictions(data);
+
 			// System.out.println("##########OBJECT################");
 			// System.out.println(desiredFault);
 			// System.out.println(objectPredictions);

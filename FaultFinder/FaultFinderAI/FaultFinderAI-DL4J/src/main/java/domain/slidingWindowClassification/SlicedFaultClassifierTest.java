@@ -16,7 +16,6 @@ import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
-import org.nd4j.evaluation.classification.Evaluation;
 
 import clasDC.faults.FaultNames;
 import clasDC.objects.CLASObject;
@@ -34,18 +33,20 @@ public class SlicedFaultClassifierTest {
 	private int iterations = 5;
 	private int scoreIterations = 1000;
 	private int numBatches = 10000;
+	private int superLayer = 1;
 
 	/**
 	 * @throws IOException
 	 * 
 	 */
 	@Builder
-	private SlicedFaultClassifierTest(CLASObject clasObject, int iterations, int scoreIterations, int numBatches)
-			throws IOException {
+	private SlicedFaultClassifierTest(CLASObject clasObject, int iterations, int scoreIterations, int numBatches,
+			int superLayer) throws IOException {
 		this.clasObject = clasObject;
 		this.iterations = iterations;
 		this.scoreIterations = scoreIterations;
 		this.numBatches = numBatches;
+		this.superLayer = superLayer;
 		run();
 	}
 
@@ -62,13 +63,13 @@ public class SlicedFaultClassifierTest {
 		// the model is stored here
 		String fileName;
 		if (containerType.equals(ContainerType.OBJ)) {
-			fileName = "models/ObjectDetectors/" + desiredFault + ".zip";
+			fileName = "models/ObjectDetectors/SL" + this.superLayer + "/" + desiredFault + ".zip";
 		} else if (containerType.equals(ContainerType.CLASS)) {
-			fileName = "models/ClassifiersII/" + desiredFault + ".zip";
+			fileName = "models/Classifiers/SL" + this.superLayer + "/" + desiredFault + ".zip";
 		} else if (containerType.equals(ContainerType.MULTICLASS)) {
-			fileName = "models/MultiClass/" + desiredFault + ".zip";
+			fileName = "models/MultiClass/SL" + this.superLayer + "/" + desiredFault + ".zip";
 		} else if (containerType.equals(ContainerType.SEG)) {
-			fileName = "models/Segmentation/" + desiredFault + ".zip";
+			fileName = "models/Segmentatio/SL" + this.superLayer + "/" + desiredFault + ".zip";
 
 		} else {
 			throw new IllegalArgumentException("Type unkown for ContainerType " + container);
@@ -121,34 +122,44 @@ public class SlicedFaultClassifierTest {
 		}
 
 		// evaluate the classifier
-		Evaluation evaluation = classifier.evaluate(clasObject.getNLabels(), 2, 10000, recordReader, strategy);
-		System.out.println("Evalation for " + desiredFault);
-		System.out.println(evaluation.stats());
+		// Evaluation evaluation = classifier.evaluate(clasObject.getNLabels(),
+		// 2, 10000, recordReader, strategy);
+		// System.out.println("Evalation for " + desiredFault);
+		// System.out.println(evaluation.stats());
 	}
 
 	public static void main(String args[]) throws IOException {
-
-		List<FaultNames> aList = Stream.of(FaultNames.HOTWIRE).collect(Collectors.toCollection(ArrayList::new));
-
+		//
 		// FaultNames.FUSE_A, FaultNames.FUSE_B, FaultNames.FUSE_C,
-		// FaultNames.CONNECTOR_TREE,
-		// FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_E,
-		// FaultNames.CHANNEL_ONE, FaultNames.CHANNEL_TWO,
-		// FaultNames.CHANNEL_THREE,
-		// FaultNames.PIN_BIG, FaultNames.PIN_SMALL, FaultNames.DEADWIRE,
-		// FaultNames.HOTWIRE
+		// FaultNames.CONNECTOR_TREE, FaultNames.CONNECTOR_THREE,
+		// FaultNames.CONNECTOR_E, FaultNames.CHANNEL_ONE,
+		// FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG,
+		// FaultNames.PIN_SMALL,
+		// FaultNames.DEADWIRE, FaultNames.HOTWIRE
+		//
+		List<FaultNames> aList = Stream.of(FaultNames.FUSE_A, FaultNames.FUSE_B, FaultNames.FUSE_C,
+				FaultNames.CONNECTOR_TREE, FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_E, FaultNames.CHANNEL_ONE,
+				FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG, FaultNames.PIN_SMALL,
+				FaultNames.DEADWIRE, FaultNames.HOTWIRE).collect(Collectors.toCollection(ArrayList::new));
 
-		for (FaultNames faultNames : aList) {
-			CLASObject clasObject = SuperLayer.builder().superlayer(3).nchannels(1).minFaults(40).maxFaults(56)
-					.desiredFault(faultNames)
-					.desiredFaults(Stream.of(FaultNames.DEADWIRE).collect(Collectors.toCollection(ArrayList::new)))
-					.singleFaultGen(false).isScaled(false).containerType(ContainerType.MULTICLASS).build();
+		for (int superlayer = 1; superlayer < 7; superlayer++) {
 
-			SlicedFaultClassifierTest sTest = SlicedFaultClassifierTest.builder().clasObject(clasObject).iterations(1)
-					.scoreIterations(1000).numBatches(10000).build();
+			for (FaultNames faultNames : aList) {
+				CLASObject clasObject = SuperLayer.builder().superlayer(superlayer).randomSuperlayer(false).nchannels(1)
+						.minFaults(3).maxFaults(10).desiredFault(faultNames)
+						.desiredFaults(Stream
+								.of(FaultNames.FUSE_A, FaultNames.FUSE_B, FaultNames.FUSE_C, FaultNames.CONNECTOR_TREE,
+										FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_E, FaultNames.CHANNEL_ONE,
+										FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG,
+										FaultNames.PIN_SMALL, FaultNames.DEADWIRE, FaultNames.HOTWIRE)
+								.collect(Collectors.toCollection(ArrayList::new)))
+						.singleFaultGen(false).isScaled(false).containerType(ContainerType.MULTICLASS).build();
 
+				SlicedFaultClassifierTest sTest = SlicedFaultClassifierTest.builder().clasObject(clasObject)
+						.iterations(5).scoreIterations(1000).numBatches(10000).superLayer(superlayer).build();
+
+			}
 		}
-
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Press enter to exit.");
 		sc.nextLine();

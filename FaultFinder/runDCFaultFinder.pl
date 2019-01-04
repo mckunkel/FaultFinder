@@ -8,7 +8,7 @@ use XML::Twig;
 my $scriptDir  = "scripts/JLabCluster/";
 my $envFile    = $scriptDir . "environment.cshrc";
 my $runScript  = $scriptDir . "run_DCFaultFinder.cshrc";
-my $javaDir    = "target/";
+my $javaDir    = "FaultFinderUI/target/";
 my $javaScript = $javaDir . "DCFaultFinderApp-jar-with-dependencies.jar";
 
 #Ok, I dont understand how to use POD:Usage along with other options,

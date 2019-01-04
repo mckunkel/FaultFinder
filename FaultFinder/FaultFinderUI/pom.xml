@@ -55,7 +55,7 @@
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
-							<finalName>DCFaultFinderWithRecommendationSystemApp</finalName>
+							<finalName>DCFaultFinderApp</finalName>
 						</configuration>
 					</execution>
 				</executions>

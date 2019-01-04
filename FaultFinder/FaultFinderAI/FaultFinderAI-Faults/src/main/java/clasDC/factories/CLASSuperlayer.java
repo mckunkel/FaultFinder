@@ -26,9 +26,6 @@ import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.INDArrayIndex;
-import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.util.ArrayUtil;
 
 import clasDC.faults.Fault;
@@ -48,15 +45,18 @@ public class CLASSuperlayer extends CLASComponent {
 
 	private AbstractFaultFactory factory = null;
 	private int superlayer;
+	private boolean randomSuperlayer = true;
 
 	@Builder
-	private CLASSuperlayer(int superlayer, int nchannels, int minFaults, int maxFaults, FaultNames desiredFault,
-			double desiredFaultGenRate, List<FaultNames> desiredFaults, boolean singleFaultGen, boolean isScaled) {
+	private CLASSuperlayer(int superlayer, boolean randomSuperlayer, int nchannels, int minFaults, int maxFaults,
+			FaultNames desiredFault, double desiredFaultGenRate, List<FaultNames> desiredFaults, boolean singleFaultGen,
+			boolean isScaled) {
 		if (superlayer > 6 || superlayer < 1) {
 			throw new IllegalArgumentException("Invalid input: (superlayer), must have values less than"
 					+ " ( 7) and more than (0). Received: (" + superlayer + ")");
 		}
 		this.superlayer = superlayer;
+		this.randomSuperlayer = randomSuperlayer;
 		this.nchannels = nchannels;
 		this.minFaults = minFaults;
 		this.maxFaults = maxFaults;
@@ -66,9 +66,9 @@ public class CLASSuperlayer extends CLASComponent {
 		this.singleFaultGen = singleFaultGen;
 		this.isScaled = isScaled;
 		this.factory = SingleFaultFactory.builder().superLayer(superlayer).minFaults(this.minFaults)
-				.maxFaults(maxFaults).desiredFault(desiredFault).desiredFaults(desiredFaults).randomSuperlayer(true)
-				.randomSmear(true).nChannels(nchannels).singleFaultGen(singleFaultGen)
-				.desiredFaultGenRate(desiredFaultGenRate).build();
+				.maxFaults(maxFaults).desiredFault(desiredFault).desiredFaults(desiredFaults)
+				.randomSuperlayer(randomSuperlayer).randomSmear(true).nChannels(nchannels)
+				.singleFaultGen(singleFaultGen).desiredFaultGenRate(desiredFaultGenRate).build();
 		init();
 
 	}
@@ -99,19 +99,19 @@ public class CLASSuperlayer extends CLASComponent {
 	}
 
 	public CLASSuperlayer getNewSuperLayer(int superLayer) {
-		CLASSuperlayer sl = CLASSuperlayer.builder().superlayer(superLayer).nchannels(this.nchannels)
-				.minFaults(this.minFaults).maxFaults(this.maxFaults).desiredFault(this.desiredFault)
-				.desiredFaults(this.desiredFaults).singleFaultGen(this.singleFaultGen).isScaled(this.isScaled)
-				.desiredFaultGenRate(this.desiredFaultGenRate).build();
+		CLASSuperlayer sl = CLASSuperlayer.builder().superlayer(superLayer).randomSuperlayer(this.randomSuperlayer)
+				.nchannels(this.nchannels).minFaults(this.minFaults).maxFaults(this.maxFaults)
+				.desiredFault(this.desiredFault).desiredFaults(this.desiredFaults).singleFaultGen(this.singleFaultGen)
+				.isScaled(this.isScaled).desiredFaultGenRate(this.desiredFaultGenRate).build();
 		return sl;
 
 	}
 
 	public CLASFactory getNewFactory() {
-		CLASFactory sl = CLASSuperlayer.builder().superlayer(this.superlayer).nchannels(this.nchannels)
-				.minFaults(this.minFaults).maxFaults(this.maxFaults).desiredFault(this.desiredFault)
-				.desiredFaults(this.desiredFaults).singleFaultGen(this.singleFaultGen).isScaled(this.isScaled)
-				.desiredFaultGenRate(this.desiredFaultGenRate).build();
+		CLASFactory sl = CLASSuperlayer.builder().superlayer(this.superlayer).randomSuperlayer(this.randomSuperlayer)
+				.nchannels(this.nchannels).minFaults(this.minFaults).maxFaults(this.maxFaults)
+				.desiredFault(this.desiredFault).desiredFaults(this.desiredFaults).singleFaultGen(this.singleFaultGen)
+				.isScaled(this.isScaled).desiredFaultGenRate(this.desiredFaultGenRate).build();
 		return sl;
 
 	}
@@ -122,6 +122,14 @@ public class CLASSuperlayer extends CLASComponent {
 
 	public Map<FaultNames, INDArray> faultLocationLabels() {
 		return factory.faultLocationLabels();
+	}
+
+	public int getSuperlayer() {
+		return this.factory.getSuperLayer();
+	}
+
+	public boolean isRandomSuperlayer() {
+		return this.factory.isRandomSuperlayer();
 	}
 
 	protected void testDrawFaults(CLASSuperlayer sl) {
@@ -295,7 +303,8 @@ public class CLASSuperlayer extends CLASComponent {
 		// FaultNames.CHANNEL_TWO,
 		// FaultNames.CHANNEL_THREE, FaultNames.DEADWIRE, FaultNames.HOTWIRE
 		FaultNames desiredFault = FaultNames.DEADWIRE;
-		CLASSuperlayer sl = CLASSuperlayer.builder().superlayer(1).nchannels(1).minFaults(2).maxFaults(5)
+		CLASSuperlayer sl = CLASSuperlayer.builder().superlayer(1).randomSuperlayer(false).nchannels(1).minFaults(2)
+				.maxFaults(5)
 				.desiredFaults(Stream
 						.of(FaultNames.CHANNEL_ONE, FaultNames.CHANNEL_TWO, FaultNames.CONNECTOR_E,
 								FaultNames.CONNECTOR_TREE, FaultNames.CONNECTOR_THREE, FaultNames.FUSE_A,
@@ -303,40 +312,10 @@ public class CLASSuperlayer extends CLASComponent {
 								FaultNames.HOTWIRE, FaultNames.DEADWIRE)
 						.collect(Collectors.toCollection(ArrayList::new)))
 				.singleFaultGen(false).isScaled(false).desiredFault(desiredFault).desiredFaultGenRate(1.0).build();
-		for (int i = 0; i < 1; i++) {
-			INDArray test = Nd4j.zeros(2, 113);
-			INDArray test2 = Nd4j.zeros(2, 113);
-			INDArray test3 = Nd4j.zeros(2, 113);
+		for (int i = 0; i < 5; i++) {
 
-			// sl.testDrawFaults(sl);
-			INDArray labels = sl.faultLocationLabels().get(desiredFault);
-			System.out.println(labels);
-			System.out.println("###########################################################################");
-			System.out.println("###########################################################################");
-			System.out.println("###########################################################################");
-
-			INDArrayIndex[] indexs = new INDArrayIndex[] { NDArrayIndex.interval(0, 1), NDArrayIndex.interval(0, 112) };
-			INDArrayIndex[] indexs2 = new INDArrayIndex[] { NDArrayIndex.interval(1, 2),
-					NDArrayIndex.interval(0, 112) };
-
-			test.put(indexs, labels.getRow(0));
-			test.put(indexs2, labels.getRow(1));
-			INDArrayIndex[] indexs3 = new INDArrayIndex[] { NDArrayIndex.interval(0, 1),
-					NDArrayIndex.interval(112, 113) };
-			INDArrayIndex[] indexs4 = new INDArrayIndex[] { NDArrayIndex.interval(1, 2),
-					NDArrayIndex.interval(112, 113) };
-			if ((double) labels.get(indexs).sumNumber() == 0.0) {
-				test.put(indexs3, 1.0);
-			}
-			if ((double) labels.get(indexs2).sumNumber() == 0.0) {
-				test.put(indexs4, 1.0);
-			}
-			// if ((double) labels.getRow(1).sumNumber() == 0.0) {
-			// test.putScalar(1, 113, 1.0);
-			// }
-			// System.out.println(labels.get(indexs));
-
-			System.out.println(test);
+			sl.getSuperlayer();
+			System.out.println(sl.getSuperlayer() + "   " + sl.isRandomSuperlayer());
 			sl = sl.getNewSuperLayer(3);
 		}
 

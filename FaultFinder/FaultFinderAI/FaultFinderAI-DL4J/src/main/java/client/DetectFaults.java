@@ -37,6 +37,8 @@ import clasDC.faults.FaultCoordinates;
 import clasDC.faults.FaultNames;
 import domain.FaultDetector.DetectorFactory;
 import lombok.Getter;
+import strategies.FaultRecordScalerStrategy;
+import strategies.MinMaxStrategy;
 import utils.FaultUtils;
 
 /**
@@ -244,8 +246,9 @@ public class DetectFaults {
 		// FaultNames.CHANNEL_TWO,
 		// FaultNames.CHANNEL_THREE, FaultNames.DEADWIRE, FaultNames.HOTWIRE
 
-		FaultNames desiredFault = FaultNames.PIN_BIG;
-		CLASSuperlayer sl = CLASSuperlayer.builder().superlayer(1).nchannels(1).minFaults(1).maxFaults(1)
+		FaultNames desiredFault = FaultNames.CHANNEL_TWO;
+		CLASSuperlayer sl = CLASSuperlayer.builder().superlayer(6).randomSuperlayer(false).nchannels(1).minFaults(1)
+				.maxFaults(1)
 				.desiredFaults(Stream
 						.of(FaultNames.PIN_BIG, FaultNames.PIN_SMALL, FaultNames.CONNECTOR_E,
 								FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_TREE, FaultNames.FUSE_A,
@@ -255,9 +258,12 @@ public class DetectFaults {
 				.singleFaultGen(false).isScaled(false).desiredFault(desiredFault).build();
 
 		int numToGen = 1;
+		FaultRecordScalerStrategy strategy = new MinMaxStrategy();
 		for (int ij = 0; ij < numToGen; ij++) {
 			INDArray data = sl.getImage().getImage();
 			data = data.reshape(ArrayUtil.combine(new long[] { 1 }, data.shape()));
+
+			strategy.normalize(data);
 			DetectFaults dFaults = new DetectFaults(data);
 
 			// List<FaultNames> aList = sl.getDesiredFaults();

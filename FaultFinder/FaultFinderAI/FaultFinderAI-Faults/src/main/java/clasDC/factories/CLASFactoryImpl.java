@@ -38,7 +38,8 @@ public class CLASFactoryImpl implements CLASFactory {
 	public void setObject() {
 		if (this.clasObject instanceof SuperLayer) {
 			SuperLayer obj = (SuperLayer) this.clasObject;
-			this.clasFactory = CLASSuperlayer.builder().superlayer(obj.getSuperlayer()).nchannels(obj.getNchannels())
+			this.clasFactory = CLASSuperlayer.builder().superlayer(obj.getSuperlayer())
+					.randomSuperlayer(obj.isRandomSuperlayer()).nchannels(obj.getNchannels())
 					.minFaults(obj.getMinFaults()).maxFaults(obj.getMaxFaults()).desiredFault(obj.getDesiredFault())
 					.desiredFaults(obj.getDesiredFaults()).singleFaultGen(obj.isSingleFaultGen())
 					.isScaled(obj.isScaled()).desiredFaultGenRate(obj.getDesiredFaultGenRate()).build();

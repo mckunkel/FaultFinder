@@ -17,6 +17,7 @@ import lombok.Getter;
  *
  */
 public abstract class CLASComponent implements CLASFactory {
+
 	protected int nchannels;
 	protected int minFaults;
 	protected int maxFaults;
