@@ -18,14 +18,18 @@ import clasDC.faults.FaultNames;
 public class Channel2Detector extends FaultDetector {
 
 	public Channel2Detector() {
+		this(0);
+	}
+
+	public Channel2Detector(int superlayer) {
 		this.desiredFault = FaultNames.CHANNEL_TWO;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	/*

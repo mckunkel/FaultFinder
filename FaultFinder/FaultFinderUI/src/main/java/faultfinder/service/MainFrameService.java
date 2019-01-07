@@ -177,4 +177,6 @@ public interface MainFrameService {
 	public List<Fault> getFaultListByMap(int superLayer, int sector);
 
 	public Frame getFrameByMap(int superLayer, int sector);
+
+	public void runAI();
 }

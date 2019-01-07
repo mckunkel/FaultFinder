@@ -15,36 +15,39 @@ public class DetectorFactory {
 	}
 
 	public static FaultDetector getDetector(FaultNames desiredFault) {
+		return getDetector(desiredFault, 0);
+	}
+
+	public static FaultDetector getDetector(FaultNames desiredFault, int superlayer) {
 		if (desiredFault.equals(FaultNames.CHANNEL_ONE)) {
-			return new Channel1Detector();
+			return new Channel1Detector(superlayer);
 		} else if (desiredFault.equals(FaultNames.CHANNEL_TWO)) {
-			return new Channel2Detector();
+			return new Channel2Detector(superlayer);
 		} else if (desiredFault.equals(FaultNames.CHANNEL_THREE)) {
-			return new Channel3Detector();
+			return new Channel3Detector(superlayer);
 		} else if (desiredFault.equals(FaultNames.FUSE_A)) {
-			return new FuseADetector();
+			return new FuseADetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.FUSE_B)) {
-			return new FuseBDetector();
+			return new FuseBDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.FUSE_C)) {
-			return new FuseCDetector();
+			return new FuseCDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.CONNECTOR_E)) {
-			return new ConnectorEDetector();
+			return new ConnectorEDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.CONNECTOR_THREE)) {
-			return new ConnectorThreeDetector();
+			return new ConnectorThreeDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.CONNECTOR_TREE)) {
-			return new ConnectorTreeDetector();
+			return new ConnectorTreeDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.PIN_SMALL)) {
-			return new PinSmallDetector();
+			return new PinSmallDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.PIN_BIG)) {
-			return new PinBigDetector();
+			return new PinBigDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.DEADWIRE)) {
-			return new DeadWireDetector();
+			return new DeadWireDetector(superlayer);
 		} else if (desiredFault.equals(FaultNames.HOTWIRE)) {
-			return new HotWireDetector();
+			return new HotWireDetector(superlayer);
 		} else {
 			throw new IllegalArgumentException("This detector is not yet implemented");
 		}
 
 	}
-
 }

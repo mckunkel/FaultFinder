@@ -18,7 +18,13 @@ import clasDC.faults.FaultNames;
 public class Channel1Detector extends FaultDetector {
 
 	public Channel1Detector() {
+		this(0);
+
+	}
+
+	public Channel1Detector(int superlayer) {
 		this.desiredFault = FaultNames.CHANNEL_ONE;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {

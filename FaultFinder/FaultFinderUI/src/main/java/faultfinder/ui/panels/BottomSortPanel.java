@@ -153,7 +153,7 @@ public class BottomSortPanel extends JPanel implements ActionListener {
 		}
 
 		this.mainFrameService.getHistogramPanel().updateCanvas(superLayerSelection, sectorSelection);
-		sendProcedure();
+		this.mainFrameService.runAI();
 	}
 
 	private void sendProcedure() {
@@ -163,7 +163,7 @@ public class BottomSortPanel extends JPanel implements ActionListener {
 		int sector = this.mainFrameService.getSelectedSector();
 		int superLayer = this.mainFrameService.getSelectedSuperlayer();
 		INDArray featureArray = this.mainFrameService.asImageMartix(sector, superLayer).getImage();
-		DetectFaults dFaults = new DetectFaults(featureArray);
+		DetectFaults dFaults = new DetectFaults(featureArray, superLayer);
 
 		// List<Fault> faults =
 		// this.mainFrameService.getFaultListByMap(superLayer, sector);

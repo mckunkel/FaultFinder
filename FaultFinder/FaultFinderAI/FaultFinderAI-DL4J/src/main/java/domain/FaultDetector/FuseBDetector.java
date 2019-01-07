@@ -18,15 +18,18 @@ import clasDC.faults.FaultNames;
 public class FuseBDetector extends FaultDetector {
 
 	public FuseBDetector() {
-		this.desiredFault = FaultNames.FUSE_B;
+		this(0);
+	}
 
+	public FuseBDetector(int superlayer) {
+		this.desiredFault = FaultNames.FUSE_B;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	/*

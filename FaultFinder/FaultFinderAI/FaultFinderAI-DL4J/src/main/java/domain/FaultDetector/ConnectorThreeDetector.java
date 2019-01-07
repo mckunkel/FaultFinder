@@ -18,15 +18,18 @@ import clasDC.faults.FaultNames;
 public class ConnectorThreeDetector extends FaultDetector {
 
 	public ConnectorThreeDetector() {
-		this.desiredFault = FaultNames.CONNECTOR_THREE;
+		this(0);
+	}
 
+	public ConnectorThreeDetector(int superlayer) {
+		this.desiredFault = FaultNames.CONNECTOR_THREE;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	/*

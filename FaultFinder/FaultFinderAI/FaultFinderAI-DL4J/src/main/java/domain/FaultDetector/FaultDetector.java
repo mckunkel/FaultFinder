@@ -26,6 +26,7 @@ import lombok.Getter;
  */
 public abstract class FaultDetector {
 	protected FaultNames desiredFault;
+	protected int superlayer;
 	@Getter
 	protected FaultSlidingInformation faultSlidingInformation;
 
@@ -38,15 +39,28 @@ public abstract class FaultDetector {
 	protected FaultObjectClassifier slidingClassifier;
 
 	protected void init() throws IOException {
+		checkSuperlayer();
 		this.classifyFile = "/models/Classifiers/" + desiredFault + ".zip";
-		this.objectFile = "/models/MultiClass/" + desiredFault + ".zip";
 		this.slidingFile = "/models/ObjectDetectors/" + desiredFault + ".zip";
+
+		if (this.superlayer != 0) {
+			this.objectFile = "/models/MultiClass/SL" + superlayer + "/" + desiredFault + ".zip";
+		} else {
+			this.objectFile = "/models/MultiClass/" + desiredFault + ".zip";
+		}
+
 		this.faultSlidingInformation = this.desiredFault.getFSlidingInformation();
 
 		this.classClassifier = new FaultObjectClassifier(classifyFile, ContainerType.CLASS);
 		this.objectClassifier = new FaultObjectClassifier(objectFile);
 		this.slidingClassifier = new FaultObjectClassifier(slidingFile);
 
+	}
+
+	private void checkSuperlayer() {
+		if (this.superlayer > 6 || this.superlayer < 0) {
+			throw new IllegalArgumentException("Wrong assignment of superlayer. Your input was " + superlayer);
+		}
 	}
 
 	public abstract INDArray getClassifierPredictions(INDArray data);
@@ -67,19 +81,15 @@ public abstract class FaultDetector {
 
 	public List<Fault> getFaults(INDArray data) {
 		List<Fault> ret = new ArrayList<>();
-		System.out.println("##########CLASSIFICATION################");
-		System.out.println(this.getClassifierPredictions(data).dup().getDouble(0) + " " + this.desiredFault);
-		System.out.println("##########################");
 
-		INDArray objectPredictions = this.getObjectPredictions(data);
+		// System.out.println("##########CLASSIFICATION################");
+		// System.out.println(this.getClassifierPredictions(data).dup().getDouble(0)
+		// + " " + this.desiredFault);
+		// System.out.println("##########################");
 
-		System.out.println("##########OBJECT################");
-		System.out.println(desiredFault);
-		System.out.println(objectPredictions);
-		System.out.println("##########################");
 		if (this.getClassifierPredictions(data).dup().getDouble(0) > 0.5) {
 
-			// INDArray objectPredictions = this.getObjectPredictions(data);
+			INDArray objectPredictions = this.getObjectPredictions(data);
 
 			// System.out.println("##########OBJECT################");
 			// System.out.println(desiredFault);
@@ -87,11 +97,13 @@ public abstract class FaultDetector {
 			// System.out.println("##########################");
 
 			double threshold = 0.2;
-			// if (this.desiredFault.equals(FaultNames.DEADWIRE)) {
-			// threshold = 0.95;
-			// } else {
-			// threshold = 0.35;
-			// }
+			if (this.desiredFault.equals(FaultNames.CHANNEL_THREE)) {
+				threshold = 0.8;
+			} else if (this.desiredFault.equals(FaultNames.PIN_BIG) || this.desiredFault.equals(FaultNames.PIN_SMALL)) {
+				threshold = 0.2;
+			} else {
+				threshold = 0.5;
+			}
 			for (int i = 0; i < objectPredictions.rows(); i++) {
 				for (int j = 0; j < objectPredictions.columns(); j++) {
 

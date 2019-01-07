@@ -32,13 +32,14 @@ public class FaultObjectClassifier {
 	 *            The file that the model is loaded from.
 	 */
 	public FaultObjectClassifier(String fileName) throws IOException {
-		InputStream is = this.getClass().getResourceAsStream(fileName);
+		InputStream is = getClass().getResourceAsStream(fileName);
 		this.network = ModelSerializer.restoreComputationGraph(is);
+
 	}
 
 	public FaultObjectClassifier(String fileName, FaultObjectContainer container) throws IOException {
 		this.container = container;
-		InputStream is = this.getClass().getResourceAsStream(fileName);
+		InputStream is = getClass().getResourceAsStream(fileName);
 
 		if (container.getClasObject().getContainerType().equals(ContainerType.CLASS)) {
 			this.network = ModelSerializer.restoreMultiLayerNetwork(is).toComputationGraph();
@@ -49,13 +50,15 @@ public class FaultObjectClassifier {
 	}
 
 	public FaultObjectClassifier(String fileName, ContainerType container) throws IOException {
-		InputStream is = this.getClass().getResourceAsStream(fileName);
-		System.out.println(is);
+		InputStream is = getClass().getResourceAsStream(fileName);
+		// System.out.println(fileName);
+		// System.out.println(is);
 		if (container.equals(ContainerType.CLASS)) {
 			this.network = ModelSerializer.restoreMultiLayerNetwork(is).toComputationGraph();
 		} else {
 			this.network = ModelSerializer.restoreComputationGraph(is);
 		}
+
 		// || container.equals(ContainerType.MULTICLASS)
 	}
 

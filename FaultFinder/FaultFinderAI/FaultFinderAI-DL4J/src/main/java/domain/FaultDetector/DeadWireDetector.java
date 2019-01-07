@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.util.ArrayUtil;
@@ -35,6 +36,17 @@ public class DeadWireDetector extends FaultDetector {
 
 	}
 
+	public DeadWireDetector(int superlayer) {
+		this.desiredFault = FaultNames.DEADWIRE;
+		this.superlayer = 0;
+		try {
+			init();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -42,7 +54,10 @@ public class DeadWireDetector extends FaultDetector {
 	 */
 	@Override
 	public INDArray getClassifierPredictions(INDArray data) {
-		return classClassifier.output(data);
+		// shall always assume there is a dead wire. Why? Because the object
+		// detector for Deadwire is just a PCA
+		return Nd4j.ones(1);
+		// return classClassifier.output(data);
 	}
 
 	/*
@@ -79,7 +94,18 @@ public class DeadWireDetector extends FaultDetector {
 			indexs = new INDArrayIndex[] { NDArrayIndex.all(), NDArrayIndex.all(), NDArrayIndex.all(),
 					NDArrayIndex.interval(i, i + 1) };
 			INDArray slice = data.get(indexs).dup();
-			norms[placer] = (double) slice.meanNumber();
+			int[] rowscols = FaultUtils.getRowsCols(slice);
+			int div = 0;
+
+			for (int j = 0; j < rowscols[1]; j++) {
+				for (int j2 = 0; j2 < rowscols[0]; j2++) {
+					double point = slice.getDouble(0, 0, j2, j);
+					if (point != 0.0) {
+						div++;
+					}
+				}
+			}
+			norms[placer] = (double) slice.sumNumber() / ((double) div);
 			placer++;
 
 		}
@@ -87,9 +113,13 @@ public class DeadWireDetector extends FaultDetector {
 		for (int i = 0; i < rowsCols[1]; i++) {
 			for (int j = 0; j < rowsCols[0]; j++) {
 				if (i < 1) {
-					threshold = 10.0;
-				} else {
-					threshold = 10.0;
+					threshold = 5.0;
+				}
+				// else if (i < 113 && i > 80) {
+				// threshold = 0.0;
+				// }
+				else {
+					threshold = 5.5;
 				}
 				if ((data.getDouble(0, 0, j, i) <= norms[i] * threshold / 100.0)
 						|| (data.getDouble(0, 0, j, i) == 0.0)) {

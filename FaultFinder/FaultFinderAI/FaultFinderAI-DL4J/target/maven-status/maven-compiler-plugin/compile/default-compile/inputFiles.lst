@@ -32,6 +32,7 @@
 /Volumes/MacStorage/WorkCodes/GitHub/FaultFinder/FaultFinder/FaultFinderAI/FaultFinderAI-DL4J/src/main/java/domain/models/Models.java
 /Volumes/MacStorage/WorkCodes/GitHub/FaultFinder/FaultFinder/FaultFinderAI/FaultFinderAI-DL4J/src/main/java/domain/FaultDetector/HotWireDetector.java
 /Volumes/MacStorage/WorkCodes/GitHub/FaultFinder/FaultFinder/FaultFinderAI/FaultFinderAI-DL4J/src/main/java/faultrecordreader/FaultRecorderScaler.java
+/Volumes/MacStorage/WorkCodes/GitHub/FaultFinder/FaultFinder/FaultFinderAI/FaultFinderAI-DL4J/src/main/java/client/DetectFaults2.java
 /Volumes/MacStorage/WorkCodes/GitHub/FaultFinder/FaultFinder/FaultFinderAI/FaultFinderAI-DL4J/src/main/java/domain/objectDetection/FaultObjectContainer.java
 /Volumes/MacStorage/WorkCodes/GitHub/FaultFinder/FaultFinder/FaultFinderAI/FaultFinderAI-DL4J/src/main/java/client/objectdetection/ValidateObjectDetection.java
 /Volumes/MacStorage/WorkCodes/GitHub/FaultFinder/FaultFinder/FaultFinderAI/FaultFinderAI-DL4J/src/main/java/domain/FaultDetector/Channel2Detector.java

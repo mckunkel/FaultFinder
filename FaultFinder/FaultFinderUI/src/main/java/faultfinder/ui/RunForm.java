@@ -272,7 +272,7 @@ public class RunForm extends JDialog implements ActionListener {
 				.setTableModel(this.mainFrameService.getBySectorAndSuperLayer(sector, superLayer));
 		this.mainFrameService.getHistogramPanel().updateCanvas(superLayer, sector);
 
-		sendProcedure();
+		this.mainFrameService.runAI();
 
 	}
 
@@ -285,7 +285,7 @@ public class RunForm extends JDialog implements ActionListener {
 		int superLayer = this.mainFrameService.getSelectedSuperlayer();
 
 		INDArray featureArray = this.mainFrameService.asImageMartix(sector, superLayer).getImage();
-		DetectFaults dFaults = new DetectFaults(featureArray);
+		DetectFaults dFaults = new DetectFaults(featureArray, superLayer);
 		// this.mainFrameService.getFaultListMap().put(new Coordinate(i, j),
 		// dFaults.getFaultList());
 

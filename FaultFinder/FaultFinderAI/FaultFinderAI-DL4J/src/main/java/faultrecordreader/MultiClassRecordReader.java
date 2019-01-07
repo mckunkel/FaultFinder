@@ -99,10 +99,8 @@ public class MultiClassRecordReader implements RecordReader {
 		// - 1] + " "
 		// + faultSlidingInformation.getXStart()[0]);
 		// FaultUtils.draw(slice);
-		// System.out.println("\n" +
-		// factory.faultLocationLabels().get(this.desiredFault) + " label \n
-		// length "
-		// + factory.faultLocationLabels().get(this.desiredFault).length());
+		// System.out.println("\n" + labels + " label \nlength " +
+		// labels.length() + " " + Nd4j.toFlattened(labels));
 		this.reset();
 		return ret;
 	}
@@ -235,7 +233,7 @@ public class MultiClassRecordReader implements RecordReader {
 								FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG,
 								FaultNames.PIN_SMALL, FaultNames.DEADWIRE, FaultNames.HOTWIRE)
 						.collect(Collectors.toCollection(ArrayList::new)))
-				.desiredFault(FaultNames.CHANNEL_ONE).desiredFaultGenRate(1.0).build();
+				.desiredFault(FaultNames.CHANNEL_THREE).desiredFaultGenRate(0.5).build();
 		// FaultNames.FUSE_A, FaultNames.FUSE_B, FaultNames.FUSE_C,
 		// FaultNames.CONNECTOR_TREE, FaultNames.CONNECTOR_THREE,
 		// FaultNames.CONNECTOR_E,

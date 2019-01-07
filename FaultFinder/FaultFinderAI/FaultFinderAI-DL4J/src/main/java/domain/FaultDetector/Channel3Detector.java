@@ -19,7 +19,12 @@ import clasDC.faults.FaultNames;
 public class Channel3Detector extends FaultDetector {
 
 	public Channel3Detector() {
+		this(0);
+	}
+
+	public Channel3Detector(int superlayer) {
 		this.desiredFault = FaultNames.CHANNEL_THREE;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {

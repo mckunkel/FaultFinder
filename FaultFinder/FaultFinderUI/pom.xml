@@ -63,11 +63,9 @@
 		</plugins>
 		<resources>
 			<resource>
-				<directory>models/</directory>
+				<directory>src/main/resources/models/</directory>
 				<includes>
-					<include>Classifiers/*.zip</include>
-					<include>MultiClass/*.zip</include>
-					<include>ObjectDectors/*.zip</include>
+					<include>**/*.zip</include>
 				</includes>
 			</resource>
 		</resources>

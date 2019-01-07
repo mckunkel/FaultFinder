@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.util.ArrayUtil;
@@ -32,7 +33,17 @@ public class HotWireDetector extends FaultDetector {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
 
+	public HotWireDetector(int superlayer) {
+		this.desiredFault = FaultNames.HOTWIRE;
+		this.superlayer = 0;
+		try {
+			init();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -42,7 +53,10 @@ public class HotWireDetector extends FaultDetector {
 	 */
 	@Override
 	public INDArray getClassifierPredictions(INDArray data) {
-		return classClassifier.output(data);
+		// shall always assume there is a hot wire. Why? Because the object
+		// detector for Hotwire is just a PCA
+		return Nd4j.ones(1);
+		// return classClassifier.output(data);
 	}
 
 	/*
@@ -73,7 +87,7 @@ public class HotWireDetector extends FaultDetector {
 		INDArray array = this.desiredFault.getPossiblePositions().dup();
 		INDArrayIndex[] indexs;
 
-		double[] norms = new double[112];
+		double[] norms = new double[rowsCols[1] / 2];
 		int placer = 0;
 		for (int i = 0; i < rowsCols[1]; i += 2) {
 			indexs = new INDArrayIndex[] { NDArrayIndex.all(), NDArrayIndex.all(), NDArrayIndex.all(),
@@ -82,14 +96,13 @@ public class HotWireDetector extends FaultDetector {
 			norms[placer] = (double) slice.medianNumber();// (double)
 															// slice.meanNumber();
 															// slice.medianNumber()
-			// System.out.println(norms[placer] + " " + slice.medianNumber());
 			placer++;
 
 		}
 
 		for (int i = 0; i < rowsCols[1]; i++) {
 			for (int j = 0; j < rowsCols[0]; j++) {
-				if (data.getDouble(0, 0, j, i) > norms[i / 2] * 2.0) {
+				if (data.getDouble(0, 0, j, i) > norms[i / 2] * 5) {
 					if (i > 3) {// skip first 4 wires, always problematic
 						array.putScalar(j, i, 1.0);
 					}

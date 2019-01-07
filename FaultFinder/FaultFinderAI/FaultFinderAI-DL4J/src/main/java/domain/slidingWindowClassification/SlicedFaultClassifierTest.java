@@ -16,6 +16,7 @@ import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
+import org.nd4j.evaluation.classification.Evaluation;
 
 import clasDC.faults.FaultNames;
 import clasDC.objects.CLASObject;
@@ -122,10 +123,9 @@ public class SlicedFaultClassifierTest {
 		}
 
 		// evaluate the classifier
-		// Evaluation evaluation = classifier.evaluate(clasObject.getNLabels(),
-		// 2, 10000, recordReader, strategy);
-		// System.out.println("Evalation for " + desiredFault);
-		// System.out.println(evaluation.stats());
+		Evaluation evaluation = classifier.evaluate(clasObject.getNLabels(), 2, 10000, recordReader, strategy);
+		System.out.println("Evalation for " + desiredFault);
+		System.out.println(evaluation.stats());
 	}
 
 	public static void main(String args[]) throws IOException {
@@ -137,10 +137,14 @@ public class SlicedFaultClassifierTest {
 		// FaultNames.PIN_SMALL,
 		// FaultNames.DEADWIRE, FaultNames.HOTWIRE
 		//
-		List<FaultNames> aList = Stream.of(FaultNames.FUSE_A, FaultNames.FUSE_B, FaultNames.FUSE_C,
-				FaultNames.CONNECTOR_TREE, FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_E, FaultNames.CHANNEL_ONE,
-				FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG, FaultNames.PIN_SMALL,
-				FaultNames.DEADWIRE, FaultNames.HOTWIRE).collect(Collectors.toCollection(ArrayList::new));
+
+		// FaultNames.FUSE_A, FaultNames.FUSE_B, FaultNames.FUSE_C,
+		// FaultNames.CONNECTOR_TREE,
+		// FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_E,
+		// FaultNames.CHANNEL_ONE,
+		// FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE,
+
+		List<FaultNames> aList = Stream.of(FaultNames.CHANNEL_THREE).collect(Collectors.toCollection(ArrayList::new));
 
 		for (int superlayer = 1; superlayer < 7; superlayer++) {
 
@@ -153,10 +157,11 @@ public class SlicedFaultClassifierTest {
 										FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG,
 										FaultNames.PIN_SMALL, FaultNames.DEADWIRE, FaultNames.HOTWIRE)
 								.collect(Collectors.toCollection(ArrayList::new)))
-						.singleFaultGen(false).isScaled(false).containerType(ContainerType.MULTICLASS).build();
+						.singleFaultGen(false).isScaled(false).containerType(ContainerType.MULTICLASS)
+						.desiredFaultGenRate(0.5).build();
 
 				SlicedFaultClassifierTest sTest = SlicedFaultClassifierTest.builder().clasObject(clasObject)
-						.iterations(5).scoreIterations(1000).numBatches(10000).superLayer(superlayer).build();
+						.iterations(10).scoreIterations(1000).numBatches(10000).superLayer(superlayer).build();
 
 			}
 		}

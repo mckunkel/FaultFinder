@@ -8,10 +8,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.putText;
 import static org.bytedeco.javacpp.opencv_imgproc.rectangle;
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -25,7 +24,6 @@ import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -36,7 +34,7 @@ import clasDC.faults.Fault;
 import clasDC.faults.FaultCoordinates;
 import clasDC.faults.FaultNames;
 import domain.FaultDetector.DetectorFactory;
-import lombok.Getter;
+import domain.FaultDetector.FaultDetector;
 import strategies.FaultRecordScalerStrategy;
 import strategies.MinMaxStrategy;
 import utils.FaultUtils;
@@ -45,26 +43,13 @@ import utils.FaultUtils;
  * @author m.c.kunkel
  *
  */
-public class DetectFaults {
+public class DetectFaults2 {
 
-	List<FaultNames> availableDetection;
-	INDArray data;
-	@Getter
-	Mat image;
-	@Getter
-	Frame frame;
-	@Getter
-	List<Fault> faultList;
-	@Getter
-	int superlayer;
+	private List<FaultNames> availableDetection;
+	private Map<Integer, List<FaultDetector>> faultDetectorMap = null;
 
-	public DetectFaults(INDArray data) {
-		this(data, 0);
-	}
-
-	public DetectFaults(INDArray data, int superlayer) {
-		this.data = data;
-		this.superlayer = superlayer;
+	public DetectFaults2() {
+		this.faultDetectorMap = new HashMap<>();
 		init();
 	}
 
@@ -75,28 +60,34 @@ public class DetectFaults {
 				FaultNames.CHANNEL_TWO, FaultNames.CHANNEL_THREE, FaultNames.PIN_BIG, FaultNames.PIN_SMALL,
 				FaultNames.DEADWIRE, FaultNames.HOTWIRE).collect(Collectors.toCollection(ArrayList::new));
 
-		setList();
-		// setMat();
-		// setFrame();
+		loadMap();
 	}
 
-	private void setList() {
-		this.faultList = runDetection();
+	private void loadMap() {
+		for (int superlayer = 1; superlayer < 7; superlayer++) {
+			List<FaultDetector> aList = new ArrayList<>();
+			for (FaultNames fault : availableDetection) {
+				aList.add(DetectorFactory.getDetector(fault, superlayer));
+			}
+			this.faultDetectorMap.put(superlayer, aList);
+		}
+
 	}
 
-	private void setFrame() {
-		OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
-		this.frame = converter.convert(this.image);
+	private List<Fault> scaleFaultList(List<Fault> faults, String comp, int preferredImageSize[]) {
+		List<Fault> aFaults = new ArrayList<>();
+		for (Fault fault : faults) {
+			fault.scaleFaultCoodinates(comp, preferredImageSize);
+			aFaults.add(fault);
+		}
+		return aFaults;
+
 	}
 
-	private void setMat() {
-		this.image = getListandMat().getRight();
-	}
-
-	public List<Fault> runDetection() {
+	public List<Fault> runDetection(INDArray data, int superlayer) {
 		List<Fault> ret = new ArrayList<>();
-		for (FaultNames fault : availableDetection) {
-			ret.addAll(DetectorFactory.getDetector(fault, superlayer).getFaults(data));
+		for (FaultDetector faultDetector : this.faultDetectorMap.get(superlayer)) {
+			ret.addAll(faultDetector.getFaults(data));
 		}
 
 		// time to clean faults because some wires might show up in other faults
@@ -142,33 +133,9 @@ public class DetectFaults {
 		return finalList;
 	}
 
-	public void detectedObjects() {
+	public Pair<List<Fault>, Frame> getListandFrame(INDArray data, int superlayer) {
 
-		CanvasFrame frame = new CanvasFrame("Valididate");
-		frame.setTitle(" Fault - Valididation");
-		frame.setCanvasSize(448, 450);
-		frame.showImage(detectedObjectsCanvas());
-	}
-
-	public Image getDetectedImage() {
-		Java2DFrameConverter converter = new Java2DFrameConverter();
-
-		Frame frame = detectedObjectsCanvas();
-		return converter.getBufferedImage(frame,
-				converter.getBufferedImageType(frame) == BufferedImage.TYPE_CUSTOM ? 1.0 : 1.0, false, null);
-
-	}
-
-	public Frame detectedObjectsCanvas() {
-		OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
-		Pair<List<Fault>, Mat> aPair = getListandMat();
-		return converter.convert(aPair.getRight());
-
-	}
-
-	public Pair<List<Fault>, Frame> getListandFrame() {
-
-		Pair<List<Fault>, Mat> aPair = getListandMat();
+		Pair<List<Fault>, Mat> aPair = getListandMat(data, superlayer);
 
 		OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
 
@@ -176,9 +143,9 @@ public class DetectFaults {
 
 	}
 
-	public Pair<List<Fault>, Mat> getListandMat() {
+	public Pair<List<Fault>, Mat> getListandMat(INDArray data, int superlayer) {
 
-		List<Fault> ret = runDetection();
+		List<Fault> ret = runDetection(data, superlayer);
 		List<Fault> toRet = new ArrayList<>();
 		for (Fault fault : ret) {
 			toRet.add(fault);
@@ -234,16 +201,6 @@ public class DetectFaults {
 
 	}
 
-	public List<Fault> scaleFaultList(List<Fault> faults, String comp, int preferredImageSize[]) {
-		List<Fault> aFaults = new ArrayList<>();
-		for (Fault fault : faults) {
-			fault.scaleFaultCoodinates(comp, preferredImageSize);
-			aFaults.add(fault);
-		}
-		return aFaults;
-
-	}
-
 	public static void main(String[] args) throws IOException {
 
 		// FaultNames.PIN_BIG, FaultNames.PIN_SMALL, FaultNames.CONNECTOR_E,
@@ -253,10 +210,10 @@ public class DetectFaults {
 		// FaultNames.CHANNEL_TWO,
 		// FaultNames.CHANNEL_THREE, FaultNames.DEADWIRE, FaultNames.HOTWIRE
 
-		FaultNames desiredFault = FaultNames.CHANNEL_TWO;
-		int superLayer = 4;
+		FaultNames desiredFault = FaultNames.CHANNEL_ONE;
+		int superLayer = 6;
 		CLASSuperlayer sl = CLASSuperlayer.builder().superlayer(superLayer).randomSuperlayer(false).nchannels(1)
-				.minFaults(1).maxFaults(3)
+				.minFaults(1).maxFaults(1)
 				.desiredFaults(Stream
 						.of(FaultNames.PIN_BIG, FaultNames.PIN_SMALL, FaultNames.CONNECTOR_E,
 								FaultNames.CONNECTOR_THREE, FaultNames.CONNECTOR_TREE, FaultNames.FUSE_A,
@@ -265,6 +222,8 @@ public class DetectFaults {
 						.collect(Collectors.toCollection(ArrayList::new)))
 				.singleFaultGen(false).isScaled(false).desiredFault(desiredFault).build();
 
+		DetectFaults2 dFaults = new DetectFaults2();
+
 		int numToGen = 1;
 		FaultRecordScalerStrategy strategy = new MinMaxStrategy();
 		for (int ij = 0; ij < numToGen; ij++) {
@@ -272,8 +231,7 @@ public class DetectFaults {
 			data = data.reshape(ArrayUtil.combine(new long[] { 1 }, data.shape()));
 
 			strategy.normalize(data);
-			DetectFaults dFaults = new DetectFaults(data, superLayer);
-
+			// dFaults.runDetection(data, superLayer);
 			// List<FaultNames> aList = sl.getDesiredFaults();
 
 			// FaultUtils.draw(data);
@@ -284,13 +242,13 @@ public class DetectFaults {
 			// System.out.println("###################################");
 			// }
 			// dFaults.detectedObjects(data);
-			Pair<List<Fault>, Frame> pair = dFaults.getListandFrame();
+			Pair<List<Fault>, Frame> pair = dFaults.getListandFrame(data, superLayer);
 			Frame frame = pair.getRight();
 			// Frame frame = dFaults.detectedObjectsCanvas(data);
 
-			// for (Fault fault : pair.getLeft()) {
-			// fault.printWireInformation();
-			// }
+			for (Fault fault : pair.getLeft()) {
+				fault.printWireInformation();
+			}
 			CanvasFrame canvas = new CanvasFrame("Valididate");
 			canvas.setTitle(" Fault - Valididation");
 			canvas.setCanvasSize(448, 450);

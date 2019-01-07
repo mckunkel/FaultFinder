@@ -26,6 +26,8 @@ import org.nd4j.linalg.factory.Nd4j;
 
 import clasDC.faults.Fault;
 import clasDC.faults.FaultNames;
+import client.DetectFaults;
+import client.DetectFaults2;
 import faultfinder.faults.ChannelLogic;
 import faultfinder.faults.DeadWireLogic;
 import faultfinder.faults.FaultLogic;
@@ -43,6 +45,7 @@ import faultfinder.ui.panels.HistogramPanel;
 import faultfinder.ui.panels.SQLPanel;
 import faultfinder.utils.Coordinate;
 import faultfinder.utils.NumberConstants;
+import faultfinder.utils.StringConstants;
 import lombok.Getter;
 import processHipo.FaultDataContainer;
 import spark.utils.MainFrameQuery;
@@ -101,6 +104,7 @@ public class MainFrameServiceImpl implements MainFrameService {
 
 	private Map<Coordinate, List<Fault>> faultListByCoordinate = null;
 	private Map<Coordinate, Frame> frameByCoordinate = null;
+	private DetectFaults2 detectFaults = new DetectFaults2();
 
 	// End new stuff for the AI
 	public MainFrameServiceImpl() {
@@ -702,6 +706,46 @@ public class MainFrameServiceImpl implements MainFrameService {
 
 	public Frame getFrameByMap(int superLayer, int sector) {
 		return this.frameByCoordinate.get(new Coordinate(superLayer - 1, sector - 1));
+	}
+
+	public void runAI() {
+		TreeSet<StatusChangeDB> queryList = new TreeSet<>();
+
+		// AI Stuff
+		int sector = this.getSelectedSector();
+		int superLayer = this.getSelectedSuperlayer();
+		INDArray featureArray = this.asImageMartix(sector, superLayer).getImage();
+		DetectFaults dFaults = new DetectFaults(featureArray, superLayer);
+		List<Fault> faults = detectFaults.runDetection(featureArray, superLayer);
+
+		for (Fault fault : faults) {
+			int xMin = (int) fault.getFaultCoordinates().getXMin();
+			int xMax = (int) fault.getFaultCoordinates().getXMax();
+			int yMin = (int) fault.getFaultCoordinates().getYMin();
+			int yMax = (int) fault.getFaultCoordinates().getYMax();
+
+			for (int i = xMin; i < xMax; i++) {
+				for (int j = yMin; j < yMax; j++) {
+					StatusChangeDB statusChangeDB = new StatusChangeDB();
+					statusChangeDB.setSector(Integer.toString(sector));
+					statusChangeDB.setSuperlayer(Integer.toString(superLayer));
+					statusChangeDB.setLoclayer(Integer.toString(j + 1));
+					statusChangeDB.setLocwire(Integer.toString(i + 1));
+					this.FaultToFaultLogic(fault.getSubFaultName());
+					statusChangeDB.setProblem_type(StringConstants.PROBLEM_TYPES[this.getFaultNum() + 1]);
+
+					// statusChangeDB.setStatus_change_type(Status_change_type.broke.toString());
+					statusChangeDB.setRunno(this.getRunNumber());
+					queryList.add(statusChangeDB);
+				}
+			}
+		}
+		this.prepareMYSQLQuery(queryList);
+		this.addToCompleteSQLList(queryList);
+		this.getDataPanel().removeItems(queryList);
+		this.clearTempSQLList();
+		this.getSQLPanel().setTableModel(this.getCompleteSQLList());
+
 	}
 
 }

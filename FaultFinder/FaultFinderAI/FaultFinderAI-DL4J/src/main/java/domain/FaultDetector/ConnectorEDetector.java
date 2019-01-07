@@ -18,15 +18,18 @@ import clasDC.faults.FaultNames;
 public class ConnectorEDetector extends FaultDetector {
 
 	public ConnectorEDetector() {
-		this.desiredFault = FaultNames.CONNECTOR_E;
+		this(0);
+	}
 
+	public ConnectorEDetector(int superlayer) {
+		this.desiredFault = FaultNames.CONNECTOR_E;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	/*

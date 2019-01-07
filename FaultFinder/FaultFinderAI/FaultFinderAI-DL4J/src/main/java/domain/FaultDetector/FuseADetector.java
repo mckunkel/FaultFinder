@@ -18,8 +18,13 @@ import clasDC.faults.FaultNames;
 public class FuseADetector extends FaultDetector {
 
 	public FuseADetector() {
-		this.desiredFault = FaultNames.FUSE_A;
+		this(0);
 
+	}
+
+	public FuseADetector(int superlayer) {
+		this.desiredFault = FaultNames.FUSE_A;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {

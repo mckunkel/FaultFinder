@@ -18,8 +18,12 @@ import clasDC.faults.FaultNames;
 public class PinSmallDetector extends FaultDetector {
 
 	public PinSmallDetector() {
-		this.desiredFault = FaultNames.PIN_SMALL;
+		this(0);
+	}
 
+	public PinSmallDetector(int superlayer) {
+		this.desiredFault = FaultNames.PIN_SMALL;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {

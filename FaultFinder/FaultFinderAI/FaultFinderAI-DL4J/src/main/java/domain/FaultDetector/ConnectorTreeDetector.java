@@ -18,8 +18,12 @@ import clasDC.faults.FaultNames;
 public class ConnectorTreeDetector extends FaultDetector {
 
 	public ConnectorTreeDetector() {
-		this.desiredFault = FaultNames.CONNECTOR_TREE;
+		this(0);
+	}
 
+	public ConnectorTreeDetector(int superlayer) {
+		this.desiredFault = FaultNames.CONNECTOR_TREE;
+		this.superlayer = superlayer;
 		try {
 			init();
 		} catch (IOException e) {
