@@ -733,7 +733,7 @@ public class MainFrameServiceImpl implements MainFrameService {
 					statusChangeDB.setLocwire(Integer.toString(i + 1));
 					this.FaultToFaultLogic(fault.getSubFaultName());
 					statusChangeDB.setProblem_type(StringConstants.PROBLEM_TYPES[this.getFaultNum() + 1]);
-
+					statusChangeDB.setStatus_change_type(Status_change_type.broke.toString());
 					// statusChangeDB.setStatus_change_type(Status_change_type.broke.toString());
 					statusChangeDB.setRunno(this.getRunNumber());
 					queryList.add(statusChangeDB);
