@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -20,14 +21,20 @@ import spark.utils.SparkManager;
 public class DBQuery {
 
 	public DBQuery() {
+		//System.out.println("Constructed");
 	}
 
 	public List<String> getAllRuns() {
 		Dataset<Row> dataDF = SparkManager.mySqlDataset().select("runno").filter("runno!=0").sort(asc("runno"))
 				.distinct();
+		//System.out.println("SHowing");
+
+		//dataDF.show();
 		// Dataset<Row> dataDF =
 		// SparkManager.mySqlDataset().select("runno").sort(asc("runno")).distinct();
-		return dataDF.map(row -> row.mkString(), Encoders.STRING()).collectAsList();
+		return dataDF.as(Encoders.STRING()).collectAsList();
+
+		//return dataDF.map(row -> row.mkString(), Encoders.STRING()).collectAsList();
 	}
 
 	public Dataset<Row> getAllRunsDataset() {
@@ -47,7 +54,8 @@ public class DBQuery {
 
 	public List<String> getAllProblems() {
 		Dataset<Row> dataDF = SparkManager.mySqlDataset().select("problem_type").sort(asc("problem_type")).distinct();
-		return dataDF.map(row -> row.mkString(), Encoders.STRING()).collectAsList();
+		return dataDF.as(Encoders.STRING()).collectAsList();
+		//return dataDF.map(row -> row.mkString(), Encoders.STRING()).collectAsList();
 	}
 
 	public Dataset<Row> getAllProblemsDataset() {
@@ -132,22 +140,27 @@ public class DBQuery {
 		Logger.getLogger("org.apache.spark.SparkContext").setLevel(Level.WARN);
 		Logger.getLogger("org").setLevel(Level.OFF);
 		Logger.getLogger("akka").setLevel(Level.OFF);
-		// List<String> test = DBQuery.getAllRuns();
-		// System.out.println("######################");
-		// System.out.println(test.size());
-		// for (String str : test) {
-		// System.out.println(str + " is the run number");
-		// }
-		// System.out.println("######################");
-		// Dataset<Row> dataDF = DBQuery.getAllRunsDataset();
-		// dataDF.foreach((ForeachFunction<Row>) row -> System.out.println("Run
-		// from Query " + row.get(0) + ""));
 		DBQuery dbQuery = new DBQuery();
-		Dataset<Row> dataDF = dbQuery.compareRun("762");
-		dataDF.show();
 
-		Dataset<StatusChangeDB> dataset = dbQuery.compareRunII("762");
-		dataset.show();
+		List<String> test = dbQuery.getAllRuns();
+		
+		
+//		System.out.println("######################");
+//		System.out.println(test.size());
+//		for (String str : test) {
+//			System.out.println(str + " is the run number");
+//		}
+//		System.out.println("######################");
+		
+//		Dataset<Row> dataDF = dbQuery.getAllRunsDataset();
+//		
+//		dataDF.foreach((ForeachFunction<Row>) row -> System.out.println("Run from Query " + row.get(0) + ""));
+//		
+//		Dataset<Row> dataDF2 = dbQuery.compareRun("762");
+//		dataDF2.show();
+//
+//		Dataset<StatusChangeDB> dataset = dbQuery.compareRunII("762");
+//		dataset.show();
 		// dataDF.foreach((ForeachFunction<Row>) row -> System.out
 		// .println("Run from Query " + row.get(0) + " " + row.get(1) + " " +
 		// row.get(2) + " "));

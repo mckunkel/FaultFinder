@@ -1,9 +1,9 @@
 strategies/SigmoidStrategy.class
 utils/ImageUtils.class
-strategies/IdentityStrategy.class
-strategies/FaultRecordScalerStrategy.class
 strategies/StandardizeMinMax.class
 strategies/MaxStrategy.class
+strategies/IdentityStrategy.class
+strategies/FaultRecordScalerStrategy.class
 strategies/StandardScore.class
 strategies/MinMaxRandomStrategy.class
 strategies/OldMaxStrategy.class

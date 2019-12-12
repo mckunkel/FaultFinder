@@ -39,17 +39,20 @@ public class TestQueries {
 		// sqlDF.show();
 
 		SparkSession spSession = SparkManager.getSession();
+
 		spSession.sql("set spark.sql.caseSensitive=false");
+
 		// Dataset<Row> demoDf =
 		// spSession.read().format("jdbc").options(jdbcOptions()).option("inferSchema",
 		// true)
 		// .option("header", true).option("comment", "#").load();
 		String[] included_tables = { "stbmap", "wiretopin", "layer", "wiretolocwire", "hvcrateslot", "hvsubslotchansf",
 				"hvsubslotchang", "senselayerrange", "hvpintolayer", "hvdbtohvtb" };
-		String url = "jdbc:mysql://clasdb:3306/dc_chan_status?jdbcCompliantTruncation=false";
+		String url = "jdbc:mysql://localhost:3306/dc_chan_status?jdbcCompliantTruncation=false";
+
 		String driver = "com.mysql.jdbc.Driver";
 		Properties props = new Properties();
-		props.setProperty("user", "clasuser");
+		props.setProperty("user", "root");
 		props.setProperty("password", "");
 
 		List<Dataset<Row>> aDatasets = new ArrayList<>();
@@ -61,12 +64,18 @@ public class TestQueries {
 		// .option("inferSchema", true).option("header",
 		// true).option("comment", "#").load();
 		// }
-		Dataset<Row> df = spSession.read().jdbc(url, "stbmap", props);
-		df.show();
-		df.createOrReplaceTempView("stbmapII");
+		
+		System.out.println("Opening");
 
-		Dataset<Row> sqlDF = spSession.sql("SELECT * FROM stbmapII");
-		sqlDF.show();
+		Dataset<Row> df = spSession.read().jdbc(url, "stbmap", props);
+		System.out.println("Opening");
+
+		df.show();
+		
+//		df.createOrReplaceTempView("stbmapII");
+//
+//		Dataset<Row> sqlDF = spSession.sql("SELECT * FROM stbmapII");
+//		sqlDF.show();
 
 	}
 

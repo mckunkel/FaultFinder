@@ -45,9 +45,6 @@ public enum SparkManager {
 
 			sparkSession = SparkSession.builder().appName(appName).master(sparkMaster)
 					.config("spark.sql.warehouse.dir", tempDir).getOrCreate();
-
-			// System.setProperty("hadoop.home.dir", ".");
-
 		}
 
 	}
@@ -181,10 +178,12 @@ public enum SparkManager {
 
 	private static Map<String, String> findDomain(String str) {
 		Map<String, String> jdbcOptions = new HashMap<String, String>();
+		//String driver = "com.mysql.cj.jdbc.Driver";
+		String driver = "com.mysql.jdbc.Driver";
 
 		if (str.contains("jlab.org")) {
 			jdbcOptions.put("url", "jdbc:mysql://clasdb:3306/dc_chan_status?jdbcCompliantTruncation=false");
-			jdbcOptions.put("driver", "com.mysql.jdbc.Driver");
+			jdbcOptions.put("driver", driver);
 			jdbcOptions.put("dbtable", "status_change");
 			jdbcOptions.put("user", "clasuser");
 			jdbcOptions.put("password", "");
@@ -199,13 +198,13 @@ public enum SparkManager {
 		// }
 		else if (str.contains("ikp")) {
 			jdbcOptions.put("url", "jdbc:mysql://localhost:3306/dc_chan_status?jdbcCompliantTruncation=false");
-			jdbcOptions.put("driver", "com.mysql.jdbc.Driver");
+			jdbcOptions.put("driver", driver);
 			jdbcOptions.put("dbtable", "status_change");
 			jdbcOptions.put("user", "root");
 			jdbcOptions.put("password", "");
 		} else {
 			jdbcOptions.put("url", "jdbc:mysql://localhost:3306/dc_chan_status?jdbcCompliantTruncation=false");
-			jdbcOptions.put("driver", "com.mysql.jdbc.Driver");
+			jdbcOptions.put("driver", driver);
 			jdbcOptions.put("dbtable", "status_change");
 			jdbcOptions.put("user", "root");
 			jdbcOptions.put("password", "");
